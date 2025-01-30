@@ -10,9 +10,14 @@ class GroceryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Grocery::all());
+        $search = $request->query('name');
+        if ($search) {
+            return Grocery::where('name','LIKE',"%{$search}%")->get();
+        } else {
+            return response()->json(Grocery::all());
+        }
     }
 
     /**
@@ -21,10 +26,11 @@ class GroceryController extends Controller
     public function store(Request $request)
     {
         // TODO: map/validate/be generally very paranoid of user input!
+        // TODO: Find existing case insensitive and update that instead
         $grocery = new Grocery;
         $grocery->name = $request->name;
         $grocery->save();
-        return response()->json([$grocery, 201]);
+        return response()->json($grocery); // TODO: Return 201
     }
 
     /**

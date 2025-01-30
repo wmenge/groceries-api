@@ -2,15 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 
-class Grocery extends Model
+class ShoppingList extends Model
 {
-    use HasFactory;
-    //
-
     public function entries(): HasMany
     {
         return $this->hasMany(ShoppingListEntry::class);
