@@ -12,9 +12,9 @@ class GroceryController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->query('name');
-        if ($search) {
-            return Grocery::where('name','LIKE',"%{$search}%")->get();
+        $query = $request->query('query');
+        if ($query) {
+            return Grocery::where('name','LIKE', '%' . $query . '%')->get();
         } else {
             return response()->json(Grocery::all());
         }
@@ -30,7 +30,7 @@ class GroceryController extends Controller
         $grocery = new Grocery;
         $grocery->name = $request->name;
         $grocery->save();
-        return response()->json($grocery); // TODO: Return 201
+        return response()->json($grocery, 201);
     }
 
     /**
@@ -43,7 +43,7 @@ class GroceryController extends Controller
         if (!empty($grocery)) {
             return response()->json($grocery);
         } else {
-            return response()->json(["Grocery not found", 404]);
+            return response()->json("Grocery not found", 404);
         }
     }
 
@@ -58,9 +58,9 @@ class GroceryController extends Controller
             // TODO: map/validate/be generally very paranoid of user input!
             if (!is_null($request->name)) $grocery->name = $request->name;
             $grocery->save();
-            return response()->json([$grocery, 200]);
+            return response()->json($grocery, 200);
         } else {
-            return response()->json(["Grocery not found", 404]);
+            return response()->json("Grocery not found", 404);
         }
     }
 
@@ -73,9 +73,9 @@ class GroceryController extends Controller
 
         if (!empty($grocery)) {
             $grocery->delete();
-            return response()->json(["Grocery deleted", 202]);
+            return response()->json("Grocery deleted", 202);
         } else {
-            return response()->json(["Grocery not found", 404]);
+            return response()->json("Grocery not found", 404);
         }
     }
 }

@@ -12,7 +12,7 @@ class ShoppingListController extends Controller
      */
     public function index()
     {
-        return response()->json(ShoppingList::all());
+        return response()->json(ShoppingList::all()->load('entries.grocery'));
     }
 
     /**
@@ -24,7 +24,7 @@ class ShoppingListController extends Controller
         $shoppingList = new ShoppingList;
         $shoppingList->name = $request->name;
         $shoppingList->save();
-        return response()->json($shoppingList); // TODO: Return 201
+        return response()->json($shoppingList, 201);
     }
 
     /**
@@ -32,12 +32,14 @@ class ShoppingListController extends Controller
      */
     public function show(int $id)
     {
-        $shoppingList = ShoppingList::find($id)->load('entries.grocery');
+        $shoppingList = ShoppingList::find($id);
+
+        $shoppingList->load('entries.grocery');
 
         if (!empty($shoppingList)) {
             return response()->json($shoppingList);
         } else {
-            return response()->json(["ShoppingList not found", 404]);
+            return response()->json("ShoppingList not found", 404);
         }
     }
 
@@ -52,9 +54,9 @@ class ShoppingListController extends Controller
             // TODO: map/validate/be generally very paranoid of user input!
             if (!is_null($request->name)) $shoppingList->name = $request->name;
             $shoppingList->save();
-            return response()->json([$shoppingList, 200]);
+            return response()->json($shoppingList);
         } else {
-            return response()->json(["ShoppingList not found", 404]);
+            return response()->json("ShoppingList not found", 404);
         }
     }
 
@@ -67,9 +69,9 @@ class ShoppingListController extends Controller
 
         if (!empty($shoppingList)) {
             $shoppingList->delete();
-            return response()->json(["ShoppingList deleted", 202]);
+            return response()->json("ShoppingList deleted", 202);
         } else {
-            return response()->json(["ShoppingList not found", 404]);
+            return response()->json("ShoppingList not found", 404);
         }
     }
 }

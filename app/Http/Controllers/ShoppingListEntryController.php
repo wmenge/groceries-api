@@ -20,7 +20,7 @@ class ShoppingListEntryController extends Controller
      */
     public function index()
     {
-        return response()->json(ShoppingListEntry::all());
+        return response()->json(ShoppingListEntry::all()->load(['grocery']));
     }
 
     /**
@@ -38,20 +38,20 @@ class ShoppingListEntryController extends Controller
         $shoppingListEntry->grocery()->associate($grocery);
         
         $shoppingListEntry->save();
-        return response()->json($shoppingListEntry); // TODO: Return 201
+        return response()->json($shoppingListEntry, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(int $shoppingListId, int $id)
     {
-        $shoppingListEntry = ShoppingListEntry::find($id);
+        $shoppingListEntry = ShoppingListEntry::find($id)->load(['grocery']);
 
         if (!empty($shoppingListEntry)) {
             return response()->json($shoppingListEntry);
         } else {
-            return response()->json(["ShoppingListEntry not found", 404]);
+            return response()->json("ShoppingListEntry not found", 404);
         }
     }
 
@@ -80,15 +80,15 @@ class ShoppingListEntryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id)
+    public function destroy(int $shoppingListId, int $id)
     {
         $shoppingListEntry = ShoppingListEntry::find($id);
 
         if (!empty($shoppingListEntry)) {
             $shoppingListEntry->delete();
-            return response()->json(["ShoppingListEntry deleted", 202]);
+            return response()->json("ShoppingListEntry deleted", 202);
         } else {
-            return response()->json(["ShoppingListEntry not found", 404]);
+            return response()->json("ShoppingListEntry not found", 404);
         }
     }
 }
