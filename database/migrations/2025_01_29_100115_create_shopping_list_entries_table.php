@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('shopping_list_id')->unsigned();
             $table->integer('grocery_id')->unsigned();
+            $table->string('status');
             $table->foreign('shopping_list_id')->references('id')->on('shopping_lists');
             $table->foreign('grocery_id')->references('id')->on('groceries');
             $table->integer('quantity');

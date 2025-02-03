@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\GroceryService;
+use App\Models\ShoppingListEntryStatusEnum;
 use App\Models\ShoppingListEntry;
 use App\Models\ShoppingList;
 use App\Models\Grocery;
@@ -62,18 +63,25 @@ class ShoppingListEntryController extends Controller
     {
         $shoppingListEntry = ShoppingListEntry::find($id);
         $shoppingList = ShoppingList::find($shoppingListId);
-        $grocery = $this->groceryService->getOrCreateGroceryByName($request->groceryName);
 
         if (!empty($shoppingListEntry)) {
             // TODO: map/validate/be generally very paranoid of user input!
+            
             if (!is_null($request->quantity)) $shoppingListEntry->quantity = $request->quantity;
             $shoppingListEntry->shoppingList()->associate($shoppingList);
-            $shoppingListEntry->grocery()->associate($grocery);
+
+            if ($request->groceryName) {
+                $grocery = $this->groceryService->getOrCreateGroceryByName($request->groceryName);
+                $shoppingListEntry->grocery()->associate($grocery);
+            }
+
+            if (!is_null($request->status)) $shoppingListEntry->status = ShoppingListEntryStatusEnum::from($request->status);
         
             $shoppingListEntry->save();
-            return response()->json([$shoppingListEntry, 200]);
+            // TODO: This doesnt set response code of request
+            return response()->json($shoppingListEntry);
         } else {
-            return response()->json(["ShoppingListEntry not found", 404]);
+            return response()->json("ShoppingListEntry not found", 404);
         }
     }
 
