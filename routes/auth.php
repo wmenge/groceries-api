@@ -7,13 +7,10 @@ use Laravel\Socialite\Facades\Socialite;
 // TODO: Move to controller, cleanup other auth mechanisms
 Route::get('/auth/github/redirect', function () {
     return Socialite::driver('github')->redirect();
-    //return Socialite::driver('github')->stateless()->redirect();
 });
  
 Route::get('/auth/github/callback', function () {
     
-    //$githubUser = Socialite::driver('github')->stateless()->user();
-    //var_dump($githubUser);
     $githubUser = Socialite::driver('github')->user();
 
     // TODO: Only create if there sis an empty user with email as a sort of invite
@@ -26,10 +23,6 @@ Route::get('/auth/github/callback', function () {
         'github_refresh_token' => $githubUser->refreshToken,
     ]);
 
-    //$token = $user->createToken('token');
-
-    //return ['token' => $token->plainTextToken];
- 
     Auth::login($user);
  
     // TODO Get from env
