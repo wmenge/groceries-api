@@ -19,9 +19,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'github_id',
-        'github_token',
-        'github_refresh_token'
+        'socialite_provider',
+        'socialite_id',
+        'socialite_token',
+        'socialite_refresh_token'
     ];
 
     /**
