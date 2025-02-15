@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('socialite_token')->nullable();
             $table->string('socialite_refresh_token')->nullable();            
 
-            $table->unique(['socialite_provider', 'socialiate_id']);
+            $table->index(['socialite_provider', 'socialite_id']);
         });
     }
 
@@ -47,8 +47,8 @@ return new class extends Migration
             $table->unique(['github_id']);
 
             if (Schema::hasColumn('users', 'socialite_provider')) {
+                $table->dropIndex('users_socialite_provider_socialite_id_index');
                 $table->dropColumn('socialite_provider');
-                $table->dropIndex('users_socialite_provide_socialiate_id_unique');
             }
 
             if (Schema::hasColumn('users', 'socialite_id')) {
