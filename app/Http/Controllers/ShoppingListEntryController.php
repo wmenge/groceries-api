@@ -30,7 +30,7 @@ class ShoppingListEntryController extends Controller
     public function store(Request $request, int $shoppingListId)
     {
         $shoppingList = ShoppingList::find($shoppingListId);
-        $grocery = $this->groceryService->getOrCreateGroceryByName($request->groceryName);
+        $grocery = $this->groceryService->getOrCreateGroceryByName(ucfirst($request->groceryName));
 
         // TODO: map/validate/be generally very paranoid of user input!
         $shoppingListEntry = new ShoppingListEntry;
@@ -71,7 +71,7 @@ class ShoppingListEntryController extends Controller
             $shoppingListEntry->shoppingList()->associate($shoppingList);
 
             if ($request->groceryName) {
-                $grocery = $this->groceryService->getOrCreateGroceryByName($request->groceryName);
+                $grocery = $this->groceryService->getOrCreateGroceryByName(ucfirst($request->groceryName));
                 $shoppingListEntry->grocery()->associate($grocery);
             }
 

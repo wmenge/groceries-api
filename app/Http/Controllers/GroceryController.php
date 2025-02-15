@@ -28,7 +28,7 @@ class GroceryController extends Controller
         // TODO: map/validate/be generally very paranoid of user input!
         // TODO: Find existing case insensitive and update that instead
         $grocery = new Grocery;
-        $grocery->name = $request->name;
+        $grocery->name = ucfirst($request->name);
         $grocery->save();
         return response()->json($grocery, 201);
     }
@@ -56,7 +56,7 @@ class GroceryController extends Controller
 
         if (!empty($grocery)) {
             // TODO: map/validate/be generally very paranoid of user input!
-            if (!is_null($request->name)) $grocery->name = $request->name;
+            if (!is_null($request->name)) $grocery->name = ucfirst($request->name);
             $grocery->save();
             return response()->json($grocery, 200);
         } else {
