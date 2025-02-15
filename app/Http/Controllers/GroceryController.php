@@ -2,22 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\Grocery;
 use Illuminate\Http\Request;
+use App\Services\SortService;
 
 class GroceryController extends Controller
 {
+    public function __construct(
+        protected SortService $sortService,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = $request->query('query');
-        if ($query) {
-            return Grocery::where('name','LIKE', '%' . $query . '%')->get();
-        } else {
-            return response()->json(Grocery::all());
+        $query = Grocery::query();
+        
+        $search = $request->query('query');
+        if ($search) {
+            $query = $query->where('name','LIKE', '%' . $search . '%');
         }
+
+        $order = $request->query('sort');
+        if ($order) {
+            $this->sortService->addSortExpression($query, $order);
+        }
+
+        return $query->get();
     }
 
     /**

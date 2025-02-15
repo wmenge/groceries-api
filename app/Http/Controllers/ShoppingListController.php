@@ -2,17 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\ShoppingList;
 use Illuminate\Http\Request;
+use App\Services\SortService;
 
 class ShoppingListController extends Controller
 {
+    public function __construct(
+        protected SortService $sortService,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(ShoppingList::all()->load('entries.grocery'));
+        // TODO: Move logic to service, valid for all items        
+        $query = ShoppingList::query()->with('entries.grocery');
+
+        // TODO: Generalize searching (?name= instead of query, prevent clash with sort param)
+        $search = $request->query('query');
+        if ($search) {
+            $query = $query->where('name','LIKE', '%' . $search . '%');
+        }
+
+        $order = $request->query('sort');
+        if ($order) {
+            $this->sortService->addSortExpression($query, $order);
+        }
+
+        return $query->get();
     }
 
     /**
@@ -22,7 +42,7 @@ class ShoppingListController extends Controller
     {
         // TODO: map/validate/be generally very paranoid of user input!
         $shoppingList = new ShoppingList;
-        $shoppingList->name = $request->name;
+        $shoppingList->name = ucfirst($request->name);
         $shoppingList->save();
         return response()->json($shoppingList, 201);
     }
@@ -52,7 +72,7 @@ class ShoppingListController extends Controller
 
         if (!empty($shoppingList)) {
             // TODO: map/validate/be generally very paranoid of user input!
-            if (!is_null($request->name)) $shoppingList->name = $request->name;
+            if (!is_null($request->name)) ucfirst($shoppingList->name = $request->name);
             $shoppingList->save();
             return response()->json($shoppingList);
         } else {
