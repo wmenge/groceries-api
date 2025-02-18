@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-class GroceryService
+class ShoppingListService
 {
     public static function isValid($data)
     {
@@ -17,7 +17,7 @@ class GroceryService
     {
         // Explicitly map parameters, be paranoid of your input
         // https://phpbestpractices.org
-        if (GroceryService::isValid($data)) {
+        if (ShoppingListService::isValid($data)) {
             $object->name = ucfirst(htmlentities($data->name, ENT_QUOTES, 'UTF-8'));
         }
 

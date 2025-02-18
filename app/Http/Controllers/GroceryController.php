@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Models\Grocery;
 use Illuminate\Http\Request;
+use App\Services\GroceryService;
 use App\Services\SortService;
 
 class GroceryController extends Controller
 {
     public function __construct(
         protected SortService $sortService,
+        protected GroceryService $groceryService
     ) {}
 
     /**
@@ -38,11 +40,13 @@ class GroceryController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: map/validate/be generally very paranoid of user input!
-        // TODO: Find existing case insensitive and update that instead
-        $grocery = new Grocery;
-        $grocery->name = ucfirst($request->name);
+        if (!$this->groceryService->isValid($request)) {
+            return response()->json('invalid', 400);
+        }
+
+        $grocery = $this->groceryService->map($request, new Grocery);
         $grocery->save();
+        
         return response()->json($grocery, 201);
     }
 
@@ -67,14 +71,17 @@ class GroceryController extends Controller
     {
         $grocery = Grocery::find($id);
 
-        if (!empty($grocery)) {
-            // TODO: map/validate/be generally very paranoid of user input!
-            if (!is_null($request->name)) $grocery->name = ucfirst($request->name);
-            $grocery->save();
-            return response()->json($grocery, 200);
-        } else {
+        if (empty($grocery)) {
             return response()->json("Grocery not found", 404);
         }
+
+        if (!$this->groceryService->isValid($request)) {
+            return response()->json('invalid', 400);
+        }
+
+        $grocery = $this->groceryService->map($request, $grocery);
+        $grocery->save();
+        return response()->json($grocery, 200);
     }
 
     /**

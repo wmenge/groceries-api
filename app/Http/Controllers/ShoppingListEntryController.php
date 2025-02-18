@@ -8,12 +8,15 @@ use App\Models\ShoppingListEntry;
 use App\Models\ShoppingList;
 use App\Models\Grocery;
 
+use App\Services\ShoppingListEntryService;
+
 use Illuminate\Http\Request;
 
 class ShoppingListEntryController extends Controller
 {
     public function __construct(
         protected GroceryService $groceryService,
+        protected ShoppingListEntryService $shoppingListEntryService
     ) {}
 
     /**
@@ -29,14 +32,15 @@ class ShoppingListEntryController extends Controller
      */
     public function store(Request $request, int $shoppingListId)
     {
+        \Log::info('Hallo!');
+        if (!$this->shoppingListEntryService->isValid($request)) {
+            return response()->json('invalid', 400);
+        }
+        
+        $shoppingListEntry = $this->shoppingListEntryService->map($request, new ShoppingListEntry);
+        
         $shoppingList = ShoppingList::find($shoppingListId);
-        $grocery = $this->groceryService->getOrCreateGroceryByName(ucfirst($request->groceryName));
-
-        // TODO: map/validate/be generally very paranoid of user input!
-        $shoppingListEntry = new ShoppingListEntry;
-        $shoppingListEntry->quantity = $request->quantity;
         $shoppingListEntry->shoppingList()->associate($shoppingList);
-        $shoppingListEntry->grocery()->associate($grocery);
         
         $shoppingListEntry->save();
         return response()->json($shoppingListEntry, 201);
@@ -64,25 +68,23 @@ class ShoppingListEntryController extends Controller
         $shoppingListEntry = ShoppingListEntry::find($id);
         $shoppingList = ShoppingList::find($shoppingListId);
 
-        if (!empty($shoppingListEntry)) {
-            // TODO: map/validate/be generally very paranoid of user input!
-            
-            if (!is_null($request->quantity)) $shoppingListEntry->quantity = $request->quantity;
-            $shoppingListEntry->shoppingList()->associate($shoppingList);
-
-            if ($request->groceryName) {
-                $grocery = $this->groceryService->getOrCreateGroceryByName(ucfirst($request->groceryName));
-                $shoppingListEntry->grocery()->associate($grocery);
-            }
-
-            if (!is_null($request->status)) $shoppingListEntry->status = ShoppingListEntryStatusEnum::from($request->status);
-        
-            $shoppingListEntry->save();
-            // TODO: This doesnt set response code of request
-            return response()->json($shoppingListEntry);
-        } else {
-            return response()->json("ShoppingListEntry not found", 404);
+        if (empty($shoppingList)) {
+            return response()->json("Shopping List not found", 404);
         }
+
+        if (empty($shoppingListEntry)) {
+            return response()->json("Shopping List Entry not found", 404);
+        }
+
+        if (!$this->shoppingListEntryService->isValid($request)) {
+            return response()->json('invalid', 400);
+        }
+        
+        $shoppingListEntry = $this->shoppingListEntryService->map($request, $shoppingListEntry);
+        $shoppingListEntry->shoppingList()->associate($shoppingList);
+        $shoppingListEntry->save();
+
+        return response()->json($shoppingListEntry, 200);
     }
 
     /**

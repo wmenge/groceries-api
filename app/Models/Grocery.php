@@ -15,4 +15,13 @@ class Grocery extends Model
     {
         return $this->hasMany(ShoppingListEntry::class);
     }
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name'
+    ];
 }

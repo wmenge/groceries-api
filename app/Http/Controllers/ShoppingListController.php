@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Models\ShoppingList;
 use Illuminate\Http\Request;
+use App\Services\ShoppingListService;
 use App\Services\SortService;
 
 class ShoppingListController extends Controller
 {
     public function __construct(
         protected SortService $sortService,
+        protected ShoppingListService $shoppingListService
     ) {}
 
     /**
@@ -40,10 +42,13 @@ class ShoppingListController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: map/validate/be generally very paranoid of user input!
-        $shoppingList = new ShoppingList;
-        $shoppingList->name = ucfirst($request->name);
+        if (!$this->shoppingListService->isValid($request)) {
+            return response()->json('invalid', 400);
+        }
+
+        $shoppingList = $this->shoppingListService->map($request, new ShoppingList);
         $shoppingList->save();
+        
         return response()->json($shoppingList, 201);
     }
 
@@ -70,14 +75,17 @@ class ShoppingListController extends Controller
     {
         $shoppingList = ShoppingList::find($id);
 
-        if (!empty($shoppingList)) {
-            // TODO: map/validate/be generally very paranoid of user input!
-            if (!is_null($request->name)) ucfirst($shoppingList->name = $request->name);
-            $shoppingList->save();
-            return response()->json($shoppingList);
-        } else {
-            return response()->json("ShoppingList not found", 404);
+        if (empty($shoppingList)) {
+            return response()->json("Shopping List not found", 404);
         }
+
+        if (!$this->shoppingListService->isValid($request)) {
+            return response()->json('invalid', 400);
+        }
+
+        $shoppingList = $this->shoppingListService->map($request, $shoppingList);
+        $shoppingList->save();
+        return response()->json($grocery, 200);
     }
 
     /**
