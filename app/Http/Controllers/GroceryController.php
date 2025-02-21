@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Grocery;
 use Illuminate\Http\Request;
 use App\Services\GroceryService;
@@ -45,6 +45,7 @@ class GroceryController extends Controller
         }
 
         $grocery = $this->groceryService->map($request, new Grocery);
+        $grocery->user()->associate(Auth::user());
         $grocery->save();
         
         return response()->json($grocery, 201);
@@ -81,6 +82,7 @@ class GroceryController extends Controller
 
         $grocery = $this->groceryService->map($request, $grocery);
         $grocery->save();
+
         return response()->json($grocery, 200);
     }
 

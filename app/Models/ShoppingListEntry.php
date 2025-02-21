@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
-//use App\Models\ShoppingListEntryStatusEnum;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ShoppingListEntry extends Model
 {
+    use IsChangeHistoryRelevant;
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     /**
      * The model's default values for attributes.
      */

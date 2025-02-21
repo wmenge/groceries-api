@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use App\Services\GroceryService;
 use App\Models\ShoppingListEntryStatusEnum;
 use App\Models\ShoppingListEntry;
@@ -32,17 +33,15 @@ class ShoppingListEntryController extends Controller
      */
     public function store(Request $request, int $shoppingListId)
     {
-        \Log::info('Hallo!');
         if (!$this->shoppingListEntryService->isValid($request)) {
             return response()->json('invalid', 400);
         }
         
         $shoppingListEntry = $this->shoppingListEntryService->map($request, new ShoppingListEntry);
-        
-        $shoppingList = ShoppingList::find($shoppingListId);
-        $shoppingListEntry->shoppingList()->associate($shoppingList);
-        
+        $shoppingListEntry->shoppingList()->associate(ShoppingList::find($shoppingListId));
+        $shoppingListEntry->user()->associate(Auth::user());
         $shoppingListEntry->save();
+
         return response()->json($shoppingListEntry, 201);
     }
 
@@ -82,7 +81,8 @@ class ShoppingListEntryController extends Controller
         
         $shoppingListEntry = $this->shoppingListEntryService->map($request, $shoppingListEntry);
         $shoppingListEntry->shoppingList()->associate($shoppingList);
-        $shoppingListEntry->save();
+        
+        $shoppingListEntry->save();        
 
         return response()->json($shoppingListEntry, 200);
     }
