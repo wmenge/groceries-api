@@ -30,10 +30,8 @@ return new class extends Migration
             $table->id();
             $table->string('table');
             $table->integer('object_id');
-            //$table->id('type');
             $table->string('changed');
             $table->timestamps();
-            //$table->unique(['name']);
         });
     }
 

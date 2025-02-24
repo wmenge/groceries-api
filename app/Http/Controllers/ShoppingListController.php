@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use App\Models\ShoppingList;
 use Illuminate\Http\Request;
 use App\Services\ShoppingListService;
@@ -47,7 +46,6 @@ class ShoppingListController extends Controller
         }
 
         $shoppingList = $this->shoppingListService->map($request, new ShoppingList);
-        $shoppingList->user()->associate(Auth::user());
         
         $shoppingList->save();
         
