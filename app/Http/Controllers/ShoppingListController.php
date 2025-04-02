@@ -6,6 +6,7 @@ use App\Models\ShoppingList;
 use Illuminate\Http\Request;
 use App\Services\ShoppingListService;
 use App\Services\SortService;
+use Illuminate\Support\Facades\DB;
 
 class ShoppingListController extends Controller
 {
@@ -20,8 +21,7 @@ class ShoppingListController extends Controller
     public function index(Request $request)
     {
         // TODO: Move logic to service, valid for all items        
-        $query = ShoppingList::query()->with('entries.grocery');
-
+        $query = ShoppingList::query()->select('shopping_lists.*');
         // TODO: Generalize searching (?name= instead of query, prevent clash with sort param)
         $search = $request->query('query');
         if ($search) {
@@ -33,6 +33,10 @@ class ShoppingListController extends Controller
             $this->sortService->addSortExpression($query, $order);
         }
 
+        // Get entry statistics (TODO: refactor raw queries)
+        $query = $query->addSelect(DB::raw('(select count(*) from shopping_list_entries where shopping_list_id = shopping_lists.id and status <> \'open\') as closedEntriesCount'));
+        $query = $query->addSelect(DB::raw('(select count(*) from shopping_list_entries where shopping_list_id = shopping_lists.id) as totalEntryCount'));
+    
         return $query->get();
     }
 
