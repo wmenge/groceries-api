@@ -6,6 +6,7 @@ use App\Models\Grocery;
 use Illuminate\Http\Request;
 use App\Services\GroceryService;
 use App\Services\SortService;
+use Illuminate\Support\Facades\DB;
 
 class GroceryController extends Controller
 {
@@ -19,7 +20,8 @@ class GroceryController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Grocery::query();
+        $query = Grocery::query()->select('groceries.*');
+        
         
         $search = $request->query('query');
         if ($search) {
@@ -30,6 +32,8 @@ class GroceryController extends Controller
         if ($order) {
             $this->sortService->addSortExpression($query, $order);
         }
+
+        $query = $query->addSelect(DB::raw('(select count(*) from shopping_list_entries where grocery_id = groceries.id) as entriesCount'));
 
         return $query->get();
     }
