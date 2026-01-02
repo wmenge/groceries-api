@@ -32,15 +32,39 @@ class ShoppingListEntryController extends Controller
      */
     public function store(Request $request, int $shoppingListId)
     {
-        if (!$this->shoppingListEntryService->isValid($request)) {
+        if(array_is_list($request->all())) {
+
+            $shoppingListEntries = array();
+
+            foreach ($request->all() as $entry) {
+                if (!$this->shoppingListEntryService->isValid((object)$entry)) {
+                    return response()->json('invalid', 400);
+                }
+            }
+
+            foreach ($request->all() as $entry) {
+                $shoppingListEntries[] = $this->storeObject((object)$entry, $shoppingListId);
+            }
+
+            return response()->json($shoppingListEntries, 201);
+        }
+
+        return response()->json($this->storeObject((object)$request->all(), $shoppingListId), 201);
+    }
+
+    private function storeObject($data, int $shoppingListId) {
+
+        if (!$this->shoppingListEntryService->isValid($data)) {
             return response()->json('invalid', 400);
         }
-        
-        $shoppingListEntry = $this->shoppingListEntryService->map($request, new ShoppingListEntry);
+
+        $shoppingListEntry = empty($data->id) ? new ShoppingListEntry() : ShoppingListEntry::find($data->id);
+
+        $shoppingListEntry = $this->shoppingListEntryService->map($data, $shoppingListEntry);
         $shoppingListEntry->shoppingList()->associate(ShoppingList::find($shoppingListId));
         $shoppingListEntry->save();
 
-        return response()->json($shoppingListEntry, 201);
+        return $shoppingListEntry;
     }
 
     /**
@@ -98,5 +122,14 @@ class ShoppingListEntryController extends Controller
         } else {
             return response()->json("ShoppingListEntry not found", 404);
         }
+    }
+
+    /**
+     * Get all open entries from all shopping lists
+     */
+    public function openEntries()
+    {
+        $shoppingListEntries = ShoppingListEntry::where('status', '=', ShoppingListEntryStatusEnum::Open)->get()->load(['grocery']);
+        return response()->json($shoppingListEntries);
     }
 }

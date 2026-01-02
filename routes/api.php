@@ -17,6 +17,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/groceries/{id}', [GroceryController::class, 'update']); // TODO: Patch?
     Route::delete('/groceries/{id}', [GroceryController::class, 'destroy']);
 
+    Route::get('/shopping-lists/open-entries', [ShoppingListEntryController::class, 'openEntries']);
     Route::get('/shopping-lists', [ShoppingListController::class, 'index']);
     Route::get('/shopping-lists/{id}', [ShoppingListController::class, 'show']);
     Route::post('/shopping-lists', [ShoppingListController::class, 'store']);
