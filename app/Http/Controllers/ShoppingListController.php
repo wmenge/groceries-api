@@ -33,11 +33,21 @@ class ShoppingListController extends Controller
             $this->sortService->addSortExpression($query, $order);
         }
 
+        $state = $request->query('state');
+        if ($state == 'active') {
+            $query = $query->whereRaw('((select count(*) from shopping_list_entries where shopping_list_entries.shopping_list_id = shopping_lists.id and status = \'open\') > 0 OR (select count(*) from shopping_list_entries where shopping_list_entries.shopping_list_id = shopping_lists.id) = 0)');
+        }
+
+        if ($state == 'closed') {
+            $query = $query->whereRaw('(select count(*) from shopping_list_entries where shopping_list_entries.shopping_list_id = shopping_lists.id) > 0');
+            $query = $query->whereRaw('(select count(*) from shopping_list_entries where shopping_list_entries.shopping_list_id = shopping_lists.id and status = \'open\') = 0');
+        }
+
         // Get entry statistics (TODO: refactor raw queries)
-        $query = $query->addSelect(DB::raw('(select count(*) from shopping_list_entries where shopping_list_id = shopping_lists.id and status <> \'open\') as closedEntriesCount'));
-        $query = $query->addSelect(DB::raw('(select count(*) from shopping_list_entries where shopping_list_id = shopping_lists.id) as totalEntryCount'));
-    
-        return $query->get();
+        $query = $query->addSelect(DB::raw('(select count(*) from shopping_list_entries where shopping_list_entries.shopping_list_id = shopping_lists.id and status <> \'open\') as closedEntriesCount'));
+        $query = $query->addSelect(DB::raw('(select count(*) from shopping_list_entries where shopping_list_entries.shopping_list_id = shopping_lists.id) as totalEntryCount'));
+        
+        return $query->paginate(12);
     }
 
     /**
