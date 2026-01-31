@@ -8,7 +8,7 @@ use App\Services\GroceryService;
 use App\Services\SortService;
 use Illuminate\Support\Facades\DB;
 
-class GroceryController extends Controller
+class GroceryController
 {
     public function __construct(
         protected SortService $sortService,

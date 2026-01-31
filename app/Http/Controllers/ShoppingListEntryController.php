@@ -12,7 +12,7 @@ use App\Services\ShoppingListEntryService;
 
 use Illuminate\Http\Request;
 
-class ShoppingListEntryController extends Controller
+class ShoppingListEntryController
 {
     public function __construct(
         protected GroceryService $groceryService,

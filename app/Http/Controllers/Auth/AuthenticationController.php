@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
 
-class AuthenticationController extends Controller
+class AuthenticationController
 {
     private $providers = ['google', 'github'];
     

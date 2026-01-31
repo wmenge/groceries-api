@@ -8,7 +8,7 @@ use App\Services\ShoppingListService;
 use App\Services\SortService;
 use Illuminate\Support\Facades\DB;
 
-class ShoppingListController extends Controller
+class ShoppingListController
 {
     public function __construct(
         protected SortService $sortService,
