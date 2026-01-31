@@ -18,7 +18,9 @@ class GroceryService
         // Explicitly map parameters, be paranoid of your input
         // https://phpbestpractices.org
         if (GroceryService::isValid($data)) {
-            $object->name = ucfirst(htmlentities($data->name, ENT_QUOTES, 'UTF-8'));
+            // trust name as FE already prevents html rendering
+            //$object->name = ucfirst(htmlentities($data->name, ENT_QUOTES, 'UTF-8'));
+            $object->name = ucfirst($data->name);
         }
 
         return $object;

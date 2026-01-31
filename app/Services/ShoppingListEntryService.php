@@ -15,7 +15,6 @@ class ShoppingListEntryService
             is_scalar($data->groceryName) &&
             !empty($data->groceryName) &&
             (empty($data->id) || is_numeric($data->id)) &&
-            Grocery::where('name', ucfirst(htmlentities($data->groceryName, ENT_QUOTES, 'UTF-8'))) && 
             is_numeric($data->quantity) &&
             !empty($data->quantity);
             is_scalar($data->status) &&
@@ -32,7 +31,8 @@ class ShoppingListEntryService
                $object->id = filter_var($data->id, FILTER_SANITIZE_NUMBER_INT); 
             }
             $object->quantity = filter_var($data->quantity, FILTER_SANITIZE_NUMBER_INT);
-            $grocery = Grocery::firstOrNew(['name' => ucfirst(htmlentities($data->groceryName, ENT_QUOTES, 'UTF-8'))]);
+            //$grocery = Grocery::firstOrNew(['name' => ucfirst(htmlentities($data->groceryName, ENT_QUOTES, 'UTF-8'))]);
+            $grocery = Grocery::firstOrNew(['name' => $data->groceryName]);
             if (!$grocery->exists) {
                 $grocery->user()->associate(Auth::user());
                 $grocery->save();

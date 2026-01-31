@@ -17,8 +17,10 @@ class ShoppingListService
     {
         // Explicitly map parameters, be paranoid of your input
         // https://phpbestpractices.org
-        if (ShoppingListService::isValid($data)) {
-            $object->name = ucfirst(htmlentities($data->name, ENT_QUOTES, 'UTF-8'));
+        if (ShoppingListService::isValid($data)) {    
+            // trust name as FE already prevents html rendering
+            //$object->name = ucfirst(htmlentities($data->name, ENT_QUOTES, 'UTF-8'));
+            $object->name = ucfirst($data->name);
         }
 
         return $object;
