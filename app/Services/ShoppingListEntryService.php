@@ -31,8 +31,9 @@ class ShoppingListEntryService
                $object->id = filter_var($data->id, FILTER_SANITIZE_NUMBER_INT); 
             }
             $object->quantity = filter_var($data->quantity, FILTER_SANITIZE_NUMBER_INT);
+            // trust name as FE already prevents html rendering
             //$grocery = Grocery::firstOrNew(['name' => ucfirst(htmlentities($data->groceryName, ENT_QUOTES, 'UTF-8'))]);
-            $grocery = Grocery::firstOrNew(['name' => $data->groceryName]);
+            $grocery = Grocery::firstOrNew(['name' => ucfirst($data->groceryName)]);
             if (!$grocery->exists) {
                 $grocery->user()->associate(Auth::user());
                 $grocery->save();
